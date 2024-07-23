@@ -1,3 +1,0 @@
-if (document.referrer.includes('https://3ab2fc09.redirect-adp.pages.dev/')) {
-    window.location.href = 'http://itou33good.starfree.jp/' + window.location.pathname;
-}
