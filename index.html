@@ -55,8 +55,8 @@
 pre{
     position:absolute;
  display:inline-block;
- top:50%;
- left: 43%;
+ top:245px;
+ left: 74px;
  transform:translateY(-50%) translateX(-50%);
 }
 
@@ -65,9 +65,43 @@ a{
     margin-left: 50%;
 }
 
-footer{
-    margin-top: 10px;
-    margin-left: 44%;
+/* 中央配置要素 */
+.centered-element {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  height: 500px;
+  background-color: #ffffff00;
+  color: rgb(0, 0, 0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  font-size: 11px;
+}
+
+/* スマホ対応（画面幅が768px以下） */
+@media screen and (max-width: 768px) {
+  .centered-element {
+    width: 250px;
+    height: 500px;
+    font-size: 11px;
+  }
+}
+
+/* 超小型画面対応（画面幅が480px以下） */
+@media screen and (max-width: 480px) {
+  .container {
+    min-height: calc(100vh - 20px);
+  }
+  
+  .centered-element {
+    width: 250px;
+    height: 500px;
+    font-size: 11px;
+  }
 }
     </style>
     <meta name="msvalidate.01" content="3CB4EB21CEFD70646D5C75967BF9C42F" />
@@ -237,7 +271,7 @@ footer{
         };
     </script>
 </header>
-    <main role="main">
+    <main role="main" class="centered-element">
         <pre role="navigation">
                   ------------- 
                      絵のLog
