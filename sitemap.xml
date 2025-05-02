@@ -5,12 +5,22 @@
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
     <loc>https://itou332.github.io/redirect/</loc>
-    <lastmod>2025-2-17</lastmod>
+    <lastmod>2025-5-1</lastmod>
     <priority>0.94</priority>
   </url>
   <url>
     <loc>https://ss914607.stars.ne.jp/wp/</loc>
-    <lastmod>2025-2-1</lastmod>
+    <lastmod>2025-5-1</lastmod>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://ss914607.stars.ne.jp/wp/%e7%b5%b5%e3%81%aelog/</loc>
+    <lastmod>2025-5-1</lastmod>
+    <priority>0.95</priority>
+   </url>
+   <url>
+    <loc>itou332-github-io.pages.dev</loc>
+    <lastmod>2025-5-1</lastmod>
     <priority>0.95</priority>
   </url>
 <url>
