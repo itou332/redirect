@@ -27,7 +27,7 @@
         }
     }
     </script>
-    <meta name='description' content='itouが制作した画像を掲載しているサイトです。'
+    <meta name='description' content='itouが制作した画像を掲載しているサイトです。'>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv=”refresh” content=”10; URL=https://ss914607.stars.ne.jp/wp/”>
@@ -104,6 +104,33 @@ a{
   }
 }
     </style>
+     <script type="speculationrules">
+  {
+    "prerender": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}],
+    "prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}]
+  }
+  </script>
+   <!--browser高速化-->
+    <script>
+    (function() {
+      // Chrome Speculation Rules API対応チェック
+      if (!('supports' in HTMLScriptElement.prototype) || !HTMLScriptElement.supports('speculationrules')) {
+        const prefetchSet = new Set();
+        function onPointerEnter() {
+          if (!prefetchSet.has(this.href)) {
+            prefetchSet.add(this.href);
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = this.href;
+            document.head.appendChild(link);
+          }
+        }
+        document.querySelectorAll('a[href^="/"]').forEach(a => {
+          a.addEventListener('pointerenter', onPointerEnter);
+        });
+      }
+    })();
+  </script>
     <meta name="msvalidate.01" content="3CB4EB21CEFD70646D5C75967BF9C42F" />
 </head>
 <body role="document">
