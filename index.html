@@ -136,167 +136,150 @@ a{
 <body role="document">
 <header>
     <canvas id="gameCanvas"></canvas>
-    <script>
-        class LifeGame {
-            constructor() {
-                this.canvas = document.getElementById('gameCanvas');
-                this.ctx = this.canvas.getContext('2d');
-                
-                // キャンバスのサイズをウィンドウに合わせる
-                this.resize();
-                window.addEventListener('resize', () => this.resize());
-                
-                // グリッドの設定（セルサイズを5に戻す）
-                this.cellSize = 5;  // 初期値に戻す
-                this.gridWidth = Math.floor(this.canvas.width / this.cellSize);
-                this.gridHeight = Math.floor(this.canvas.height / this.cellSize);
-                
-                // セルの状態と色を管理する配列
-                this.grid = [];
-                this.nextGrid = [];
-                this.colors = [];
-                
-                // 初期化
-                this.init();
-                
-                // アニメーション開始
-                this.animate();
-                
-                // 12秒後にフェードアウト開始
-                setTimeout(() => {
-                    this.canvas.style.opacity = '0';
-                }, 12000);
+<script>
+class LifeGame {
+  constructor() {
+    this.canvas = document.getElementById('gameCanvas');
+    this.ctx = this.canvas.getContext('2d');
+    
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+    
+    this.cellSize = 5;
+    this.gridWidth = Math.floor(this.canvas.width / this.cellSize);
+    this.gridHeight = Math.floor(this.canvas.height / this.cellSize);
+    
+    this.grid = [];
+    this.nextGrid = [];
+    this.colors = [];
+    
+    this.init();
+    this.animate();
+    
+    setTimeout(() => {
+      this.canvas.style.opacity = '0';
+    }, 12000);
+  }
+  
+  resize() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+    this.gridWidth = Math.floor(this.canvas.width / this.cellSize);
+    this.gridHeight = Math.floor(this.canvas.height / this.cellSize);
+    this.init();
+  }
+  
+  init() {
+    for(let y = 0; y < this.gridHeight; y++) {
+      this.grid[y] = [];
+      this.nextGrid[y] = [];
+      this.colors[y] = [];
+      for(let x = 0; x < this.gridWidth; x++) {
+        const alive = Math.random() > 0.7 ? 1 : 0;
+        const hue = Math.floor(Math.random() * 360);
+        const saturation = 70 + Math.floor(Math.random() * 30);
+        const lightness = 50 + Math.floor(Math.random() * 20);
+        
+        this.grid[y][x] = alive;
+        this.nextGrid[y][x] = 0;
+        this.colors[y][x] = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      }
+    }
+  }
+  
+  countNeighbors(x, y) {
+    let neighbors = 0;
+    for(let dy = -1; dy <= 1; dy++) {
+      for(let dx = -1; dx <= 1; dx++) {
+        if(dx === 0 && dy === 0) continue;
+        const newX = ((x + dx + this.gridWidth) % this.gridWidth);
+        const newY = ((y + dy + this.gridHeight) % this.gridHeight);
+        neighbors += this.grid[newY][newX];
+      }
+    }
+    return neighbors;
+  }
+  
+  update() {
+    const newColors = Array(this.gridHeight).fill().map(() => 
+      Array(this.gridWidth).fill(null));
+    
+    for(let y = 0; y < this.gridHeight; y++) {
+      for(let x = 0; x < this.gridWidth; x++) {
+        const neighbors = this.countNeighbors(x, y);
+        const alive = this.grid[y][x];
+        
+        if(alive === 1 && (neighbors < 2 || neighbors > 3)) {
+          this.nextGrid[y][x] = 0;
+          newColors[y][x] = null;
+        } else if(alive === 0 && neighbors === 3) {
+          this.nextGrid[y][x] = 1;
+          const neighborColors = [];
+          for(let dy = -1; dy <= 1; dy++) {
+            for(let dx = -1; dx <= 1; dx++) {
+              if(dx === 0 && dy === 0) continue;
+              const newX = ((x + dx + this.gridWidth) % this.gridWidth);
+              const newY = ((y + dy + this.gridHeight) % this.gridHeight);
+              if(this.grid[newY][newX] === 1) {
+                neighborColors.push(this.colors[newY][newX]);
+              }
             }
-            
-            resize() {
-                this.canvas.width = window.innerWidth;
-                this.canvas.height = window.innerHeight;
-                
-                // グリッドサイズの再計算
-                this.gridWidth = Math.floor(this.canvas.width / this.cellSize);
-                this.gridHeight = Math.floor(this.canvas.height / this.cellSize);
-                
-                // グリッドの再初期化
-                this.init();
-            }
-            
-            init() {
-                // グリッドの初期化（ランダムな値と色を設定）
-                for(let y = 0; y < this.gridHeight; y++) {
-                    this.grid[y] = [];
-                    this.nextGrid[y] = [];
-                    this.colors[y] = [];
-                    
-                    for(let x = 0; x < this.gridWidth; x++) {
-                        const alive = Math.random() > 0.7 ? 1 : 0;
-                        
-                        const hue = Math.floor(Math.random() * 360);
-                        const saturation = 70 + Math.floor(Math.random() * 30);
-                        const lightness = 50 + Math.floor(Math.random() * 20);
-                        
-                        this.grid[y][x] = alive;
-                        this.nextGrid[y][x] = 0;
-                        this.colors[y][x] = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-                    }
-                }
-            }
-            
-            countNeighbors(x, y) {
-                let neighbors = 0;
-                for(let dy = -1; dy <= 1; dy++) {
-                    for(let dx = -1; dx <= 1; dx++) {
-                        if(dx === 0 && dy === 0) continue;
-                        
-                        const newX = ((x + dx + this.gridWidth) % this.gridWidth);
-                        const newY = ((y + dy + this.gridHeight) % this.gridHeight);
-                        neighbors += this.grid[newY][newX];
-                    }
-                }
-                return neighbors;
-            }
-            
-            update() {
-                const newColors = Array(this.gridHeight).fill().map(() => 
-                    Array(this.gridWidth).fill(null));
-                
-                for(let y = 0; y < this.gridHeight; y++) {
-                    for(let x = 0; x < this.gridWidth; x++) {
-                        const neighbors = this.countNeighbors(x, y);
-                        const alive = this.grid[y][x];
-                        
-                        if(alive === 1 && (neighbors < 2 || neighbors > 3)) {
-                            this.nextGrid[y][x] = 0;
-                            newColors[y][x] = null;
-                        } else if(alive === 0 && neighbors === 3) {
-                            this.nextGrid[y][x] = 1;
-                            
-                            const neighborColors = [];
-                            for(let dy = -1; dy <= 1; dy++) {
-                                for(let dx = -1; dx <= 1; dx++) {
-                                    if(dx === 0 && dy === 0) continue;
-                                    const newX = ((x + dx + this.gridWidth) % this.gridWidth);
-                                    const newY = ((y + dy + this.gridHeight) % this.gridHeight);
-                                    if(this.grid[newY][newX] === 1) {
-                                        neighborColors.push(this.colors[newY][newX]);
-                                    }
-                                }
-                            }
-                            
-                            if(neighborColors.length > 0) {
-                                newColors[y][x] = neighborColors[
-                                    Math.floor(Math.random() * neighborColors.length)
-                                ];
-                            } else {
-                                const hue = Math.floor(Math.random() * 360);
-                                const saturation = 70 + Math.floor(Math.random() * 30);
-                                const lightness = 50 + Math.floor(Math.random() * 20);
-                                newColors[y][x] = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-                            }
-                        } else {
-                            this.nextGrid[y][x] = alive;
-                            newColors[y][x] = this.colors[y][x];
-                        }
-                    }
-                }
-                
-                for(let y = 0; y < this.gridHeight; y++) {
-                    for(let x = 0; x < this.gridWidth; x++) {
-                        this.grid[y][x] = this.nextGrid[y][x];
-                        this.colors[y][x] = newColors[y][x];
-                    }
-                }
-            }
-            
-            draw() {
-                this.ctx.fillStyle = '#f0f0f0';
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                for(let y = 0; y < this.gridHeight; y++) {
-                    for(let x = 0; x < this.gridWidth; x++) {
-                        if(this.grid[y][x] === 1 && this.colors[y][x]) {
-                            this.ctx.fillStyle = this.colors[y][x];
-                            this.ctx.fillRect(
-                                x * this.cellSize,
-                                y * this.cellSize,
-                                this.cellSize - 1,
-                                this.cellSize - 1
-                            );
-                        }
-                    }
-                }
-            }
-            
-            animate() {
-                this.update();
-                this.draw();
-                requestAnimationFrame(() => this.animate());
-            }
+          }
+          if(neighborColors.length > 0) {
+            newColors[y][x] = neighborColors[
+              Math.floor(Math.random() * neighborColors.length)
+            ];
+          } else {
+            const hue = Math.floor(Math.random() * 360);
+            const saturation = 70 + Math.floor(Math.random() * 30);
+            const lightness = 50 + Math.floor(Math.random() * 20);
+            newColors[y][x] = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+          }
+        } else {
+          this.nextGrid[y][x] = alive;
+          newColors[y][x] = this.colors[y][x];
         }
+      }
+    }
+    
+    for(let y = 0; y < this.gridHeight; y++) {
+      for(let x = 0; x < this.gridWidth; x++) {
+        this.grid[y][x] = this.nextGrid[y][x];
+        this.colors[y][x] = newColors[y][x];
+      }
+    }
+  }
+  
+  draw() {
+    this.ctx.fillStyle = '#f0f0f0';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    for(let y = 0; y < this.gridHeight; y++) {
+      for(let x = 0; x < this.gridWidth; x++) {
+        if(this.grid[y][x] === 1 && this.colors[y][x]) {
+          this.ctx.fillStyle = this.colors[y][x];
+          this.ctx.fillRect(
+            x * this.cellSize,
+            y * this.cellSize,
+            this.cellSize - 1,
+            this.cellSize - 1
+          );
+        }
+      }
+    }
+  }
+  
+  animate() {
+    this.update();
+    this.draw();
+    requestAnimationFrame(() => this.animate());
+  }
+}
 
-        window.onload = () => {
-            new LifeGame();
-        };
-    </script>
+window.onload = () => {
+  new LifeGame();
+};
+</script>
 </header>
     <main role="main" class="centered-element">
         <pre role="navigation">
@@ -325,4 +308,5 @@ a{
 </footer>
 </body>
 </html>
+
 
